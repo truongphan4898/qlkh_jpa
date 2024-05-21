@@ -3,27 +3,42 @@ package org.example.qlkh_jpa.controller;
 import org.example.qlkh_jpa.model.Customer;
 import org.example.qlkh_jpa.service.ICustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/customers")
 public class CustomerController {
     @Autowired
    private ICustomerService customerService;
+//    @GetMapping("")
+//    public String index (Model model){
+//        List<Customer> customerList=customerService.findAll();
+//        model.addAttribute("customer",customerList);
+//        return "/index";
+//    }
     @GetMapping("")
-    public String index (Model model){
-        List<Customer> customerList=customerService.findAll();
-        model.addAttribute("customer",customerList);
+    public String index (@RequestParam(defaultValue = "",required = false) String search,@PageableDefault(page = 0,size =2 ,sort = "name")  Pageable pageable, Model model){
+        Page<Customer> customerPage=customerService.findCustomerByNameContaining(search,pageable);
+        model.addAttribute("customerPage",customerPage);
         return "/index";
     }
+//    @GetMapping("")
+//    public String listCustomersSearch(@RequestParam(defaultValue = "",required = false) String search, Pageable pageable,Model model){
+//        Page<Customer> customers = customerService.findCustomerByNameContaining(search,pageable);
+//        model.addAttribute("customerPage",customers);
+//        return "/index";
+//    }
+
     @GetMapping("/create")
     public String create(Model model) {
         model.addAttribute("customer", new Customer());
